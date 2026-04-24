@@ -1,4 +1,4 @@
-package br.com.carmona.finance
+package br.com.finance
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

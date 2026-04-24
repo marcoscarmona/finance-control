@@ -1,6 +1,10 @@
-package br.com.carmona.finance.repository
+package br.com.finance.repository
 
-import br.com.carmona.finance.model.*
+import br.com.finance.model.CategoryEntity
+import br.com.finance.model.InstallmentEntity
+import br.com.finance.model.MerchantRuleEntity
+import br.com.finance.model.SubscriptionEntity
+import br.com.finance.model.TransactionEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param

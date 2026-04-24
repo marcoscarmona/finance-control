@@ -1,8 +1,8 @@
-package br.com.carmona.finance.service
+package br.com.finance.service
 
-import br.com.carmona.finance.model.CategoryEntity
-import br.com.carmona.finance.repository.CategoryRepository
-import br.com.carmona.finance.repository.MerchantRuleRepository
+import br.com.finance.model.CategoryEntity
+import br.com.finance.repository.CategoryRepository
+import br.com.finance.repository.MerchantRuleRepository
 import org.springframework.stereotype.Service
 
 @Service

@@ -1,11 +1,11 @@
-package br.com.carmona.finance.model
+package br.com.finance.model
 
 import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.UUID
+import java.util.*
 
 @Entity
 @Table(name = "transactions")

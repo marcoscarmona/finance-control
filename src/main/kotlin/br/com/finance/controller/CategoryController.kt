@@ -1,8 +1,8 @@
-package br.com.carmona.finance.controller
+package br.com.finance.controller
 
-import br.com.carmona.finance.dto.CategoryRequest
-import br.com.carmona.finance.dto.CategoryResponse
-import br.com.carmona.finance.model.CategoryEntity
+import br.com.finance.dto.CategoryRequest
+import br.com.finance.dto.CategoryResponse
+import br.com.finance.model.CategoryEntity
 import br.com.carmona.finance.repository.CategoryRepository
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*

@@ -1,4 +1,4 @@
-package br.com.carmona.finance.dto
+package br.com.finance.dto
 
 import br.com.carmona.finance.model.TransactionType
 import jakarta.validation.constraints.NotBlank

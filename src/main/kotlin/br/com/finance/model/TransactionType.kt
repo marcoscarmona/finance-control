@@ -1,4 +1,4 @@
-package br.com.carmona.finance.model
+package br.com.finance.model
 
 enum class TransactionType {
     DEBIT,

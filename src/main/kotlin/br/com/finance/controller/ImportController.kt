@@ -1,6 +1,6 @@
-package br.com.carmona.finance.controller
+package br.com.finance.controller
 
-import br.com.carmona.finance.service.ImportService
+import br.com.finance.service.ImportService
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping

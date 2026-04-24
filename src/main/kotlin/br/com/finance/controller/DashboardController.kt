@@ -1,6 +1,6 @@
-package br.com.carmona.finance.controller
+package br.com.finance.controller
 
-import br.com.carmona.finance.service.DashboardService
+import br.com.finance.service.DashboardService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam

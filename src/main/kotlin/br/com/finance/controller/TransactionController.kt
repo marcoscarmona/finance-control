@@ -1,6 +1,6 @@
-package br.com.carmona.finance.controller
+package br.com.finance.controller
 
-import br.com.carmona.finance.dto.CreateTransactionRequest
+import br.com.finance.dto.CreateTransactionRequest
 import br.com.carmona.finance.service.TransactionService
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*

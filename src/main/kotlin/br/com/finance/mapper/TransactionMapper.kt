@@ -1,7 +1,7 @@
-package br.com.carmona.finance.mapper
+package br.com.finance.mapper
 
-import br.com.carmona.finance.dto.TransactionResponse
-import br.com.carmona.finance.model.TransactionEntity
+import br.com.finance.dto.TransactionResponse
+import br.com.finance.model.TransactionEntity
 
 fun TransactionEntity.toResponse() = TransactionResponse(
     id = id,

@@ -1,9 +1,9 @@
-package br.com.carmona.finance.service
+package br.com.finance.service
 
-import br.com.carmona.finance.dto.DashboardResponse
-import br.com.carmona.finance.dto.SummaryItem
+import br.com.finance.dto.DashboardResponse
+import br.com.finance.dto.SummaryItem
 import br.com.carmona.finance.model.TransactionType
-import br.com.carmona.finance.repository.TransactionRepository
+import br.com.finance.repository.TransactionRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal

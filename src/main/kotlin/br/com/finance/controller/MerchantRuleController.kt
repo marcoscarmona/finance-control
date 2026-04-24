@@ -1,8 +1,8 @@
-package br.com.carmona.finance.controller
+package br.com.finance.controller
 
-import br.com.carmona.finance.dto.MerchantRuleRequest
-import br.com.carmona.finance.dto.MerchantRuleResponse
-import br.com.carmona.finance.model.MerchantRuleEntity
+import br.com.finance.dto.MerchantRuleRequest
+import br.com.finance.dto.MerchantRuleResponse
+import br.com.finance.model.MerchantRuleEntity
 import br.com.carmona.finance.repository.CategoryRepository
 import br.com.carmona.finance.repository.MerchantRuleRepository
 import jakarta.validation.Valid
