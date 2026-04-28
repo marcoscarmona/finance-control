@@ -1,0 +1,12 @@
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\infrastructure\adapters\Adapters.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\application\dto\Dtos.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\infrastructure\persistence\mappers\Mappers.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\interfaces\web\controllers\Controllers.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\infrastructure\persistence\entities\JpaEntities.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\domain\entities\Entities.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\infrastructure\persistence\repositories\JpaRepositories.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\application\usecases\UseCases.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\infrastructure\config\WebConfig.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\application\ports\out\Repositories.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\domain\enums\Enums.kt
+C:\Users\DELL\Documents\repository\finance-control\backend\src\main\kotlin\br\com\financialcontrol\FinancialControlApplication.kt

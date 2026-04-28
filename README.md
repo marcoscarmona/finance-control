@@ -1,55 +1,138 @@
-# Finance Control — Kotlin + Spring Boot
+# 💰 Financial Control — Controle Financeiro Pessoal
 
-Projeto base para controle financeiro pessoal com importação de lançamentos, categorização, resumo mensal e dashboard.
+Sistema de controle financeiro pessoal com monorepo, backend Spring Boot + Kotlin e frontend Next.js.
 
-## Stack
+## Pré-requisitos
 
-- Kotlin
-- Spring Boot
-- PostgreSQL
-- Flyway
-- Docker Compose
-- Gradle Kotlin DSL
+- Java 21
+- Docker e Docker Compose
+- Node.js 18+
+- npm
 
-## Como rodar
+## 🚀 Como rodar
+
+### 1. Subir o banco de dados
 
 ```bash
 docker compose up -d
+```
+
+O PostgreSQL ficará disponível em `localhost:5432`.  
+As migrations do Flyway criam automaticamente as tabelas e inserem dados demo ao subir o backend.
+
+### 2. Rodar o backend
+
+**Linux/macOS:**
+```bash
+cd backend
 ./gradlew bootRun
 ```
 
-API:
-
-```text
-http://localhost:8080
+**Windows:**
+```bash
+cd backend
+gradlew.bat bootRun
 ```
 
-## Endpoints principais
+O backend estará disponível em: http://localhost:8080
 
-```text
-POST /api/transactions
-GET  /api/transactions?month=2026-04
-GET  /api/dashboard?month=2026-04
-POST /api/import/csv
-GET  /api/categories
-POST /api/categories
-POST /api/rules
-GET  /api/rules
+### 3. Rodar o frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-## CSV esperado
+O frontend estará disponível em: http://localhost:3000
+
+---
+
+## 🔗 URLs
+
+| Serviço   | URL                                  |
+|-----------|--------------------------------------|
+| Frontend  | http://localhost:3000                |
+| Backend   | http://localhost:8080                |
+| Dashboard API | http://localhost:8080/api/users/{userId}/dashboard?yearMonth=2026-04 |
+| Demo user | http://localhost:8080/api/users/demo |
+
+---
+
+## 🗂️ Estrutura do projeto
+
+```
+/
+├── docker-compose.yml
+├── README.md
+├── backend/
+│   ├── build.gradle.kts
+│   ├── settings.gradle.kts
+│   └── src/main/kotlin/br/com/financialcontrol/
+│       ├── FinancialControlApplication.kt
+│       ├── domain/
+│       │   ├── entities/
+│       │   └── enums/
+│       ├── application/
+│       │   ├── dto/
+│       │   ├── ports/out/
+│       │   └── usecases/
+│       ├── infrastructure/
+│       │   ├── adapters/
+│       │   ├── config/
+│       │   └── persistence/
+│       └── interfaces/web/controllers/
+└── frontend/
+    ├── package.json
+    ├── next.config.js
+    └── src/
+        ├── app/          (páginas Next.js)
+        ├── components/   (componentes reutilizáveis)
+        ├── lib/          (api, utils)
+        └── types/        (TypeScript types)
+```
+
+---
+
+## 🌱 Dados de Demo
+
+O banco é populado automaticamente com:
+
+- **Usuário:** Marcos Carmona (marcos.demo@email.com)
+- **Bancos:** C6 Bank, Nubank
+- **Cartões:** C6 Carbon, Nubank Ultravioleta
+- **Categorias padrão:** Alimentação, Mercado, Transporte, Saúde, Assinaturas, Compras, Lazer, Educação, Moradia, Outros
+- **30+ transações** de Abril/2026 prontas para o dashboard
+- **Orçamentos** por categoria para comparação
+
+---
+
+## 📥 Formato do CSV para importação
 
 ```csv
-date,bank,description,amount,type
-2026-04-01,C6,IFOOD RESTAURANTE,89.90,DEBIT
-2026-04-02,NUBANK,PAGAMENTO FATURA,1000.00,CREDIT
+date,bank,description,category,amount,paymentMethod
+2026-04-15,Nubank,Supermercado,Mercado,-350.00,DEBIT_CARD
+2026-04-16,C6 Bank,Uber,Transporte,-45.00,CREDIT_CARD
+2026-04-20,Nubank,Salário,Salário,8000.00,BANK_TRANSFER
 ```
 
-## Próximos passos recomendados
+---
 
-1. Criar frontend Next.js.
-2. Adicionar autenticação.
-3. Melhorar importação OFX.
-4. Criar regras editáveis pela UI.
-5. Criar orçamento mensal por categoria.
-6. Exportar dashboard para Excel.
+## 🛠 Tecnologias
+
+**Backend:**
+- Kotlin + Java 21
+- Spring Boot 3.2
+- Spring Data JPA + Hibernate
+- Flyway
+- PostgreSQL
+
+**Frontend:**
+- Next.js 14
+- TypeScript
+- Tailwind CSS
+- Recharts
+
+**Infraestrutura:**
+- Docker Compose
+- PostgreSQL 16
