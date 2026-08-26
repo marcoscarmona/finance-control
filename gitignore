@@ -21,6 +21,10 @@ out/
 
 build/
 .gradle/
+backend/build/
+backend/.gradle/
+docker-build.out
+docker-build.err
 gradle-app.setting
 !gradle/wrapper/gradle-wrapper.jar
 local.properties
