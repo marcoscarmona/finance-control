@@ -1,0 +1,12 @@
+package br.com.financialcontrol.application.port.output
+
+import br.com.financialcontrol.domain.model.User
+import java.util.UUID
+
+interface UserPersistencePort {
+    fun save(user: User): User
+
+    fun findById(id: UUID): User?
+
+    fun existsByEmail(email: String): Boolean
+}

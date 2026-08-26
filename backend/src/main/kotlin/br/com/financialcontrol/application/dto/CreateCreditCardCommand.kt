@@ -1,0 +1,13 @@
+package br.com.financialcontrol.application.dto
+
+import java.math.BigDecimal
+import java.util.UUID
+
+data class CreateCreditCardCommand(
+    val bankId: UUID,
+    val name: String,
+    val lastFourDigits: String,
+    val limitAmount: BigDecimal,
+    val closingDay: Int,
+    val dueDay: Int,
+)

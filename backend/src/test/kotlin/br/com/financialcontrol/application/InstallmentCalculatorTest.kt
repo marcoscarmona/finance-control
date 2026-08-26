@@ -1,5 +1,6 @@
 package br.com.financialcontrol.application
 
+import br.com.financialcontrol.domain.service.InstallmentCalculator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -11,7 +12,10 @@ class InstallmentCalculatorTest {
 
     @Test
     fun `splits the remainder into the last installment`() {
-        assertEquals(listOf(BigDecimal("33.33"), BigDecimal("33.33"), BigDecimal("33.34")), calculator.split(BigDecimal("100.00"), 3))
+        assertEquals(
+            listOf(BigDecimal("33.33"), BigDecimal("33.33"), BigDecimal("33.34")),
+            calculator.split(BigDecimal("100.00"), 3),
+        )
     }
 
     @Test

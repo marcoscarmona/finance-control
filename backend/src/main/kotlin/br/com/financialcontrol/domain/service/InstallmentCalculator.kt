@@ -1,0 +1,24 @@
+package br.com.financialcontrol.domain.service
+
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.YearMonth
+
+class InstallmentCalculator {
+    fun split(
+        total: BigDecimal,
+        count: Int,
+    ): List<BigDecimal> {
+        require(count > 0)
+        require(total > BigDecimal.ZERO)
+        val base = total.divide(BigDecimal(count), 2, RoundingMode.DOWN)
+        val remainder = total - base * BigDecimal(count)
+        return List(count) { if (it == count - 1) base + remainder else base }
+    }
+
+    fun referenceMonth(
+        date: LocalDate,
+        closingDay: Int,
+    ): YearMonth = if (date.dayOfMonth >= closingDay) YearMonth.from(date).plusMonths(1) else YearMonth.from(date)
+}
