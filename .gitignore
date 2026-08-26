@@ -1,0 +1,23 @@
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Gradle and compiled output
+.gradle/
+build/
+backend/.gradle/
+backend/build/
+
+# Logs and local configuration
+*.log
+*.tmp
+.env
+.env.*
+
+# Node tooling (kept for future clients)
+node_modules/
+.next/
+dist/
