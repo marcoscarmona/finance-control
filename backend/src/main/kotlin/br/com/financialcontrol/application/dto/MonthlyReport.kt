@@ -1,7 +1,6 @@
 package br.com.financialcontrol.application.dto
 
 import br.com.financialcontrol.domain.enum.SubscriptionFrequency
-import br.com.financialcontrol.domain.model.ExpenseInstallment
 import java.math.BigDecimal
 import java.util.UUID
 
@@ -17,7 +16,30 @@ data class CardTotal(
     val detailedTotal: BigDecimal,
     val manualTotal: BigDecimal?,
     val adjustment: BigDecimal,
+    val amountDue: BigDecimal,
+    val purchasesTotal: BigDecimal,
+    val paymentsAndCredits: BigDecimal,
+    val unclassifiedPurchases: BigDecimal,
+    val futureInstallmentsTotal: BigDecimal,
     val categories: List<CategoryTotal>,
+)
+
+data class UpcomingInstallment(
+    val cardId: UUID,
+    val cardName: String,
+    val description: String,
+    val category: String,
+    val number: Int,
+    val total: Int,
+    val amount: BigDecimal,
+    val dueDate: java.time.LocalDate,
+)
+
+data class UpcomingInstallmentsByCard(
+    val cardId: UUID,
+    val cardName: String,
+    val total: BigDecimal,
+    val installments: List<UpcomingInstallment>,
 )
 
 data class SubscriptionForecast(
@@ -34,5 +56,5 @@ data class MonthlyReport(
     val expensesByCategory: List<CategoryTotal>,
     val cardInvoices: List<CardTotal>,
     val activeSubscriptions: List<SubscriptionForecast>,
-    val upcomingInstallments: List<ExpenseInstallment>,
+    val upcomingInstallmentsByCard: List<UpcomingInstallmentsByCard>,
 )

@@ -4,6 +4,8 @@ import br.com.financialcontrol.application.dto.CardTotal
 import br.com.financialcontrol.application.dto.CategoryTotal
 import br.com.financialcontrol.application.dto.MonthlyReport
 import br.com.financialcontrol.application.dto.SubscriptionForecast
+import br.com.financialcontrol.application.dto.UpcomingInstallment
+import br.com.financialcontrol.application.dto.UpcomingInstallmentsByCard
 import br.com.financialcontrol.application.port.input.GenerateMonthlyReportUseCase
 import br.com.financialcontrol.application.port.output.CardInvoiceManualTotalPersistencePort
 import br.com.financialcontrol.application.port.output.CategoryPersistencePort
@@ -12,6 +14,7 @@ import br.com.financialcontrol.application.port.output.ExpenseInstallmentPersist
 import br.com.financialcontrol.application.port.output.ExpensePersistencePort
 import br.com.financialcontrol.application.port.output.SubscriptionPersistencePort
 import br.com.financialcontrol.application.port.output.UserPersistencePort
+import java.math.BigDecimal
 import java.time.YearMonth
 import java.util.UUID
 
@@ -42,11 +45,12 @@ class MonthlyReportApplicationService(
                         )
                     }
                 }.sortedByDescending { it.total }
+        val projectionEnd = YearMonth.of(YearMonth.now().year + 1, 12).atEndOfMonth()
         val future =
             installments.findAllByUserIdAndDueDateBetween(
                 userId,
                 month.plusMonths(1).atDay(1),
-                month.plusMonths(3).atEndOfMonth(),
+                projectionEnd,
             )
         val cardTotals =
             cards.findAllByUserId(userId).map { card ->
@@ -58,13 +62,20 @@ class MonthlyReportApplicationService(
                     } else {
                         null
                     }
+                val amountDue = manualTotal ?: detailedTotal
+                val adjustment = amountDue.subtract(detailedTotal)
                 CardTotal(
                     card.id,
                     card.name,
-                    manualTotal ?: detailedTotal,
+                    amountDue,
                     detailedTotal,
                     manualTotal,
-                    (manualTotal ?: detailedTotal).subtract(detailedTotal),
+                    adjustment,
+                    amountDue,
+                    detailedTotal,
+                    adjustment.min(BigDecimal.ZERO).abs(),
+                    adjustment.max(BigDecimal.ZERO),
+                    future.filter { expensesById[it.expenseId]?.creditCardId == card.id }.sumOf { it.amount },
                     cardItems
                         .groupBy { expensesById[it.expenseId]?.categoryId }
                         .mapNotNull { (categoryId, rows) ->
@@ -91,6 +102,26 @@ class MonthlyReportApplicationService(
                 }.sortedBy { it.chargeDay }
         val nonCardTotal = items.filter { expensesById[it.expenseId]?.creditCardId == null }.sumOf { it.amount }
         val totalExpenses = nonCardTotal.add(cardTotals.sumOf { it.total })
-        return MonthlyReport(totalExpenses, categoriesTotal, cardTotals, forecast, future)
+        val upcomingByCard =
+            future
+                .mapNotNull { installment ->
+                    val expense = expensesById[installment.expenseId] ?: return@mapNotNull null
+                    val cardId = expense.creditCardId ?: return@mapNotNull null
+                    val card = cards.findById(cardId) ?: return@mapNotNull null
+                    UpcomingInstallment(
+                        cardId,
+                        card.name,
+                        expense.merchant ?: expense.description,
+                        categories.findById(expense.categoryId)?.name ?: "Sem categoria",
+                        installment.number,
+                        installment.total,
+                        installment.amount,
+                        installment.dueDate,
+                    )
+                }.groupBy { it.cardId }
+                .map { (cardId, rows) ->
+                    UpcomingInstallmentsByCard(cardId, rows.first().cardName, rows.sumOf { it.amount }, rows.sortedBy { it.dueDate })
+                }.sortedBy { it.cardName }
+        return MonthlyReport(totalExpenses, categoriesTotal, cardTotals, forecast, upcomingByCard)
     }
 }
