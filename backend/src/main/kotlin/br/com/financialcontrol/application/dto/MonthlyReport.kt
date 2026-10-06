@@ -17,12 +17,16 @@ data class CardTotal(
     val detailedTotal: BigDecimal,
     val manualTotal: BigDecimal?,
     val adjustment: BigDecimal,
+    val categories: List<CategoryTotal>,
 )
 
 data class SubscriptionForecast(
     val name: String,
     val amount: BigDecimal,
     val frequency: SubscriptionFrequency,
+    val chargeDay: Int,
+    val category: String,
+    val paymentSource: String,
 )
 
 data class MonthlyReport(

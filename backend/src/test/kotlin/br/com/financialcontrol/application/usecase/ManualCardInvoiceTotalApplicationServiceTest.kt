@@ -53,8 +53,7 @@ class ManualCardInvoiceTotalApplicationServiceTest {
     private class InMemoryTotals : CardInvoiceManualTotalPersistencePort {
         val values = mutableMapOf<Pair<UUID, YearMonth>, CardInvoiceManualTotal>()
 
-        override fun save(total: CardInvoiceManualTotal) =
-            total.also { values[it.creditCardId to it.referenceMonth] = it }
+        override fun save(total: CardInvoiceManualTotal) = total.also { values[it.creditCardId to it.referenceMonth] = it }
 
         override fun findByCardIdAndReferenceMonth(
             cardId: UUID,

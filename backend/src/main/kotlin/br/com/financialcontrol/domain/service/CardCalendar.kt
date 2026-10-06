@@ -19,7 +19,7 @@ class CardCalendar {
         closingDate: LocalDate,
     ): LocalDate =
         if (rule == CardDateRule.FIXED_DAY) {
-            month.plusMonths(1).atDay(day.coerceAtMost(month.plusMonths(1).lengthOfMonth()))
+            month.atDay(day.coerceAtMost(month.lengthOfMonth()))
         } else {
             dateFor(month, day, rule, closingDate)
         }

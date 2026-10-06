@@ -50,7 +50,8 @@ class MonthlyReportApplicationService(
             )
         val cardTotals =
             cards.findAllByUserId(userId).map { card ->
-                val detailedTotal = items.filter { expensesById[it.expenseId]?.creditCardId == card.id }.sumOf { it.amount }
+                val cardItems = items.filter { expensesById[it.expenseId]?.creditCardId == card.id }
+                val detailedTotal = cardItems.sumOf { it.amount }
                 val manualTotal =
                     if (month == YearMonth.now()) {
                         manualTotals.findByCardIdAndReferenceMonth(card.id, month)?.totalAmount
@@ -64,13 +65,30 @@ class MonthlyReportApplicationService(
                     detailedTotal,
                     manualTotal,
                     (manualTotal ?: detailedTotal).subtract(detailedTotal),
+                    cardItems
+                        .groupBy { expensesById[it.expenseId]?.categoryId }
+                        .mapNotNull { (categoryId, rows) ->
+                            categoryId?.let { CategoryTotal(categories.findById(it)?.name ?: "Unknown", rows.sumOf { row -> row.amount }) }
+                        }.sortedByDescending { it.total },
                 )
             }
         val forecast =
             subscriptions
                 .findAllByUserId(userId)
                 .filter { it.active }
-                .map { SubscriptionForecast(it.name, it.amount, it.frequency) }
+                .map { subscription ->
+                    val paymentSource =
+                        subscription.creditCardId?.let { cardId -> cards.findById(cardId)?.name ?: "Cartão" }
+                            ?: "Conta"
+                    SubscriptionForecast(
+                        subscription.name,
+                        subscription.amount,
+                        subscription.frequency,
+                        subscription.chargeDay,
+                        categories.findById(subscription.categoryId)?.name ?: "Sem categoria",
+                        paymentSource,
+                    )
+                }.sortedBy { it.chargeDay }
         val nonCardTotal = items.filter { expensesById[it.expenseId]?.creditCardId == null }.sumOf { it.amount }
         val totalExpenses = nonCardTotal.add(cardTotals.sumOf { it.total })
         return MonthlyReport(totalExpenses, categoriesTotal, cardTotals, forecast, future)

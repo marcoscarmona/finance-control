@@ -33,6 +33,14 @@ class CardCalendarTest {
     }
 
     @Test
+    fun `uses the fixed due day in the invoice reference month`() {
+        val month = YearMonth.of(2026, 10)
+        val closing = calendar.closingDate(month, 5, CardDateRule.FIXED_DAY)
+
+        assertEquals(LocalDate.of(2026, 10, 13), calendar.dueDate(month, 13, CardDateRule.FIXED_DAY, closing))
+    }
+
+    @Test
     fun `moves purchase on business closing date into next invoice`() {
         val calculator = InstallmentCalculator()
 
