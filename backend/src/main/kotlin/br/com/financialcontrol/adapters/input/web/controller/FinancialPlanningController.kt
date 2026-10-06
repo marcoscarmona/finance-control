@@ -2,15 +2,18 @@ package br.com.financialcontrol.adapters.input.web.controller
 
 import br.com.financialcontrol.adapters.output.persistence.entity.InvestmentGoalJpaEntity
 import br.com.financialcontrol.adapters.output.persistence.entity.InvestmentPositionJpaEntity
+import br.com.financialcontrol.adapters.output.persistence.entity.IncomeForecastJpaEntity
 import br.com.financialcontrol.adapters.output.persistence.entity.ReceivableJpaEntity
 import br.com.financialcontrol.adapters.output.persistence.entity.RecurringExpenseJpaEntity
 import br.com.financialcontrol.adapters.output.persistence.repository.InvestmentGoalRepository
 import br.com.financialcontrol.adapters.output.persistence.repository.InvestmentPositionRepository
+import br.com.financialcontrol.adapters.output.persistence.repository.IncomeForecastRepository
 import br.com.financialcontrol.adapters.output.persistence.repository.ReceivableRepository
 import br.com.financialcontrol.adapters.output.persistence.repository.RecurringExpenseRepository
 import br.com.financialcontrol.adapters.output.persistence.repository.UserSpringDataRepository
 import br.com.financialcontrol.application.dto.CreateExpenseCommand
 import br.com.financialcontrol.application.port.input.CreateExpenseUseCase
+import br.com.financialcontrol.application.port.input.GenerateMonthlyReportUseCase
 import br.com.financialcontrol.domain.enum.PaymentMethod
 import br.com.financialcontrol.domain.enum.ReceivableStatus
 import br.com.financialcontrol.domain.enum.RecurringExpenseKind
@@ -35,10 +38,12 @@ import java.util.UUID
 class FinancialPlanningController(
     private val users: UserSpringDataRepository,
     private val positions: InvestmentPositionRepository,
+    private val incomes: IncomeForecastRepository,
     private val goals: InvestmentGoalRepository,
     private val receivables: ReceivableRepository,
     private val recurring: RecurringExpenseRepository,
     private val createExpense: CreateExpenseUseCase,
+    private val reports: GenerateMonthlyReportUseCase,
 ) {
     @GetMapping("/investments")
     fun investments(@PathVariable userId: UUID, @RequestParam year: Int, @RequestParam month: Int): List<InvestmentPositionJpaEntity> {
@@ -52,7 +57,7 @@ class FinancialPlanningController(
         require(body.amount >= BigDecimal.ZERO) { "O saldo não pode ser negativo." }
         val reference = YearMonth.of(body.year, body.month).toString()
         val existing = positions.findAllByUserIdAndReferenceMonth(userId, reference).firstOrNull { it.institution.equals(body.institution.trim(), true) }
-        return positions.save((existing ?: InvestmentPositionJpaEntity(userId = userId)).also { it.institution = body.institution.trim(); it.referenceMonth = reference; it.amount = body.amount })
+        return positions.save((existing ?: InvestmentPositionJpaEntity(userId = userId)).also { it.institution = body.institution.trim(); it.referenceMonth = reference; it.amount = body.amount; it.availableForPayments = body.availableForPayments })
     }
 
     @GetMapping("/investment-goal")
@@ -72,6 +77,34 @@ class FinancialPlanningController(
     fun createReceivable(@PathVariable userId: UUID, @RequestBody body: ReceivableRequest): ReceivableJpaEntity {
         requireUser(userId); require(body.amount > BigDecimal.ZERO) { "O valor deve ser maior que zero." }
         return receivables.save(ReceivableJpaEntity(userId = userId, personName = body.personName.trim(), description = body.description.trim(), amount = body.amount, dueDate = body.dueDate))
+    }
+
+    @GetMapping("/income-forecasts")
+    fun listIncome(@PathVariable userId: UUID, @RequestParam year: Int, @RequestParam month: Int) = incomes.findAllByUserIdAndReferenceMonth(userId, YearMonth.of(year, month).toString())
+
+    @PutMapping("/income-forecasts")
+    fun saveIncome(@PathVariable userId: UUID, @RequestBody body: IncomeForecastRequest): IncomeForecastJpaEntity {
+        requireUser(userId); require(body.amount > BigDecimal.ZERO) { "A entrada deve ser maior que zero." }
+        val reference = YearMonth.of(body.year, body.month).toString()
+        val existing = incomes.findAllByUserIdAndReferenceMonth(userId, reference).firstOrNull { it.sourceName.equals(body.sourceName.trim(), true) }
+        return incomes.save((existing ?: IncomeForecastJpaEntity(userId = userId)).also { it.sourceName = body.sourceName.trim(); it.referenceMonth = reference; it.amount = body.amount })
+    }
+
+    @GetMapping("/projection")
+    fun projection(@PathVariable userId: UUID, @RequestParam startYear: Int, @RequestParam startMonth: Int, @RequestParam endYear: Int, @RequestParam endMonth: Int): List<CashProjectionRow> {
+        requireUser(userId)
+        val start = YearMonth.of(startYear, startMonth); val end = YearMonth.of(endYear, endMonth)
+        require(!end.isBefore(start)) { "O fim deve ser posterior ao início." }
+        val allPositions = positions.findAllByUserId(userId); var available = allPositions.filter { it.referenceMonth == start.toString() && it.availableForPayments }.sumOf { it.amount }; var patrimony = allPositions.filter { it.referenceMonth == start.toString() }.sumOf { it.amount }
+        return generateSequence(start) { if (it < end) it.plusMonths(1) else null }.map { month ->
+            val snapshot = allPositions.filter { it.referenceMonth == month.toString() }
+            if (snapshot.isNotEmpty()) { available = snapshot.filter { it.availableForPayments }.sumOf { it.amount }; patrimony = snapshot.sumOf { it.amount } }
+            val income = incomes.findAllByUserIdAndReferenceMonth(userId, month.toString()).sumOf { it.amount }
+            val receivable = receivables.findAllByUserId(userId).filter { it.status == ReceivableStatus.PENDING && it.dueDate?.let { date -> YearMonth.from(date) == month } == true }.sumOf { it.amount }
+            val fixed = recurring.findAllByUserId(userId).filter { it.active && it.kind == RecurringExpenseKind.FIXED_EXPENSE && !month.atEndOfMonth().isBefore(it.startDate) }.sumOf { it.amount }
+            val payments = reports.execute(userId, month).totalExpenses.add(fixed); val opening = available; available = available.add(income).add(receivable).subtract(payments); patrimony = patrimony.add(income).add(receivable).subtract(payments)
+            CashProjectionRow(month.toString(), opening, income, receivable, payments, available, patrimony)
+        }.toList()
     }
 
     @PutMapping("/receivables/{id}/receive")
@@ -104,8 +137,10 @@ class FinancialPlanningController(
     private fun changeReceivable(userId: UUID, id: UUID, status: ReceivableStatus) = receivables.findById(id).filter { it.userId == userId }.orElseThrow { IllegalArgumentException("Valor a receber não encontrado.") }.also { it.status = status; it.receivedAt = if (status == ReceivableStatus.RECEIVED) LocalDate.now() else null }.let(receivables::save)
 }
 
-data class InvestmentPositionRequest(val institution: String, val year: Int, val month: Int, val amount: BigDecimal)
+data class InvestmentPositionRequest(val institution: String, val year: Int, val month: Int, val amount: BigDecimal, val availableForPayments: Boolean = false)
 data class InvestmentGoalRequest(val targetAmount: BigDecimal, val targetDate: LocalDate)
-data class ReceivableRequest(val personName: String, val description: String, val amount: BigDecimal, val dueDate: LocalDate)
+data class ReceivableRequest(val personName: String, val description: String, val amount: BigDecimal, val dueDate: LocalDate? = null)
+data class IncomeForecastRequest(val sourceName: String, val year: Int, val month: Int, val amount: BigDecimal)
+data class CashProjectionRow(val month: String, val openingAvailable: BigDecimal, val expectedIncome: BigDecimal, val receivables: BigDecimal, val payments: BigDecimal, val closingAvailable: BigDecimal, val projectedPatrimony: BigDecimal)
 data class RecurringExpenseRequest(val categoryId: UUID, val creditCardId: UUID?, val accountId: UUID?, val name: String, val amount: BigDecimal, val kind: RecurringExpenseKind, val frequency: SubscriptionFrequency, val chargeDay: Int, val startDate: LocalDate)
 data class ConfirmRecurringRequest(val year: Int, val month: Int)
