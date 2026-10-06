@@ -11,3 +11,7 @@ interface CreateUserUseCase {
 interface GetUserUseCase {
     fun execute(userId: UUID): User
 }
+
+interface FindUserByEmailUseCase {
+    fun execute(email: String): User
+}

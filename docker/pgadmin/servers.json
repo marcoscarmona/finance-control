@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Financial Control",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "financial_control",
+      "Username": "financial_user",
+      "SSLMode": "prefer"
+    }
+  }
+}

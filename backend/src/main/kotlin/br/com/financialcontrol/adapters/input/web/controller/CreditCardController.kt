@@ -38,6 +38,8 @@ class CreditCardController(
             body.limitAmount,
             body.closingDay,
             body.dueDay,
+            body.closingRule,
+            body.dueRule,
         ),
     )
 

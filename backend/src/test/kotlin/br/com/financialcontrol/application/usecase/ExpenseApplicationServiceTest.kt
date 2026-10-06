@@ -14,6 +14,7 @@ import br.com.financialcontrol.domain.model.Category
 import br.com.financialcontrol.domain.model.CreditCard
 import br.com.financialcontrol.domain.model.Expense
 import br.com.financialcontrol.domain.model.ExpenseInstallment
+import br.com.financialcontrol.domain.service.CardCalendar
 import br.com.financialcontrol.domain.service.InstallmentCalculator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -37,6 +38,7 @@ class ExpenseApplicationServiceTest {
                 Installments(),
                 Invoices(),
                 InstallmentCalculator(),
+                CardCalendar(),
             )
         val result =
             service.execute(
@@ -95,6 +97,13 @@ class ExpenseApplicationServiceTest {
         override fun findById(id: UUID): Expense? = null
 
         override fun findAllByUserId(userId: UUID) = emptyList<Expense>()
+
+        override fun existsByUserIdAndDescriptionAndPurchaseDateAndTotalAmount(
+            userId: UUID,
+            description: String,
+            purchaseDate: LocalDate,
+            totalAmount: BigDecimal,
+        ) = false
     }
 
     private class Installments : ExpenseInstallmentPersistencePort {

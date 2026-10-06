@@ -24,6 +24,8 @@ class CreditCardPersistenceAdapter(
                     card.limitAmount,
                     card.closingDay,
                     card.dueDay,
+                    card.closingRule,
+                    card.dueRule,
                     card.active,
                 ),
             ).toDomain()
@@ -33,4 +35,5 @@ class CreditCardPersistenceAdapter(
     override fun findAllByUserId(userId: UUID) = repository.findAllByUserId(userId).map { it.toDomain() }
 }
 
-private fun CreditCardJpaEntity.toDomain() = CreditCard(id, userId, bankId, name, lastFourDigits, limitAmount, closingDay, dueDay, active)
+private fun CreditCardJpaEntity.toDomain() =
+    CreditCard(id, userId, bankId, name, lastFourDigits, limitAmount, closingDay, dueDay, closingRule, dueRule, active)

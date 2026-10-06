@@ -33,6 +33,8 @@ class UserApplicationServiceTest {
 
         override fun findById(id: UUID): User? = values[id]
 
+        override fun findByEmail(email: String): User? = values.values.firstOrNull { it.email == email }
+
         override fun existsByEmail(email: String): Boolean = values.values.any { it.email == email }
     }
 }

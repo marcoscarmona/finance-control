@@ -35,6 +35,13 @@ class ExpensePersistenceAdapter(
     override fun findById(id: UUID) = repository.findById(id).getOrNull()?.toDomain()
 
     override fun findAllByUserId(userId: UUID) = repository.findAllByUserId(userId).map { it.toDomain() }
+
+    override fun existsByUserIdAndDescriptionAndPurchaseDateAndTotalAmount(
+        userId: UUID,
+        description: String,
+        purchaseDate: java.time.LocalDate,
+        totalAmount: java.math.BigDecimal,
+    ) = repository.existsByUserIdAndDescriptionAndPurchaseDateAndTotalAmount(userId, description, purchaseDate, totalAmount)
 }
 
 private fun ExpenseJpaEntity.toDomain() =

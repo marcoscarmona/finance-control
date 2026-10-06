@@ -14,6 +14,7 @@ import br.com.financialcontrol.domain.enum.PaymentMethod
 import br.com.financialcontrol.domain.model.CardInvoice
 import br.com.financialcontrol.domain.model.Expense
 import br.com.financialcontrol.domain.model.ExpenseInstallment
+import br.com.financialcontrol.domain.service.CardCalendar
 import br.com.financialcontrol.domain.service.InstallmentCalculator
 import java.time.LocalDateTime
 import java.util.UUID
@@ -26,6 +27,7 @@ class ExpenseApplicationService(
     private val installments: ExpenseInstallmentPersistencePort,
     private val invoices: CardInvoicePersistencePort,
     private val calculator: InstallmentCalculator,
+    private val calendar: CardCalendar,
 ) : CreateExpenseUseCase,
     ListExpensesUseCase {
     override fun execute(
@@ -80,14 +82,19 @@ class ExpenseApplicationService(
         card: br.com.financialcontrol.domain.model.CreditCard,
         date: java.time.LocalDate,
     ): CardInvoice {
-        val month = calculator.referenceMonth(date, card.closingDay)
+        val month = calculator.referenceMonth(date, card.closingDay, card.closingRule, calendar)
         return invoices.findByCardIdAndReferenceMonth(card.id, month) ?: invoices.save(
             CardInvoice(
                 UUID.randomUUID(),
                 card.id,
                 month,
-                month.atDay(card.closingDay.coerceAtMost(month.lengthOfMonth())),
-                month.atDay(card.dueDay.coerceAtMost(month.lengthOfMonth())).plusMonths(1),
+                calendar.closingDate(month, card.closingDay, card.closingRule),
+                calendar.dueDate(
+                    month,
+                    card.dueDay,
+                    card.dueRule,
+                    calendar.closingDate(month, card.closingDay, card.closingRule),
+                ),
             ),
         )
     }

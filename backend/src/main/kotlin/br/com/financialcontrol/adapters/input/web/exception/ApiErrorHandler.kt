@@ -7,7 +7,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
 class ApiErrorHandler {
-    @ExceptionHandler(IllegalArgumentException::class, NoSuchElementException::class)
+    @ExceptionHandler(IllegalArgumentException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun invalid(error: RuntimeException) = mapOf("message" to (error.message ?: "Invalid request"))
+
+    @ExceptionHandler(NoSuchElementException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun notFound(error: NoSuchElementException) = mapOf("message" to (error.message ?: "Resource not found"))
 }

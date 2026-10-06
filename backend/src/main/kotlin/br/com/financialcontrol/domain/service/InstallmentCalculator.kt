@@ -1,5 +1,6 @@
 package br.com.financialcontrol.domain.service
 
+import br.com.financialcontrol.domain.enum.CardDateRule
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -20,5 +21,11 @@ class InstallmentCalculator {
     fun referenceMonth(
         date: LocalDate,
         closingDay: Int,
-    ): YearMonth = if (date.dayOfMonth >= closingDay) YearMonth.from(date).plusMonths(1) else YearMonth.from(date)
+        closingRule: CardDateRule = CardDateRule.FIXED_DAY,
+        calendar: CardCalendar = CardCalendar(),
+    ): YearMonth {
+        val currentMonth = YearMonth.from(date)
+        val closingDate = calendar.closingDate(currentMonth, closingDay, closingRule)
+        return if (date >= closingDate) currentMonth.plusMonths(1) else currentMonth
+    }
 }

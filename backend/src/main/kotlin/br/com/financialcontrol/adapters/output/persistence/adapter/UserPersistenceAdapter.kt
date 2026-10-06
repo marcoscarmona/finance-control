@@ -16,6 +16,8 @@ class UserPersistenceAdapter(
 
     override fun findById(id: UUID) = repository.findById(id).getOrNull()?.toDomain()
 
+    override fun findByEmail(email: String) = repository.findByEmail(email)?.toDomain()
+
     override fun existsByEmail(email: String) = repository.existsByEmail(email)
 }
 

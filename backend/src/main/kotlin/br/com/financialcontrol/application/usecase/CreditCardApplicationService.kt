@@ -11,6 +11,7 @@ import br.com.financialcontrol.application.port.output.CreditCardPersistencePort
 import br.com.financialcontrol.application.port.output.ExpenseInstallmentPersistencePort
 import br.com.financialcontrol.domain.model.CardInvoice
 import br.com.financialcontrol.domain.model.CreditCard
+import br.com.financialcontrol.domain.service.CardCalendar
 import br.com.financialcontrol.domain.service.InstallmentCalculator
 import java.time.YearMonth
 import java.util.UUID
@@ -21,6 +22,7 @@ class CreditCardApplicationService(
     private val invoices: CardInvoicePersistencePort,
     private val installments: ExpenseInstallmentPersistencePort,
     private val calculator: InstallmentCalculator,
+    private val calendar: CardCalendar,
 ) : CreateCreditCardUseCase,
     ListCreditCardsUseCase,
     GetCardInvoiceUseCase {
@@ -40,6 +42,8 @@ class CreditCardApplicationService(
                 command.limitAmount,
                 command.closingDay,
                 command.dueDay,
+                command.closingRule,
+                command.dueRule,
             ),
         )
     }
@@ -73,8 +77,13 @@ class CreditCardApplicationService(
                 UUID.randomUUID(),
                 card.id,
                 month,
-                month.atDay(card.closingDay.coerceAtMost(month.lengthOfMonth())),
-                month.atDay(card.dueDay.coerceAtMost(month.lengthOfMonth())).plusMonths(1),
+                calendar.closingDate(month, card.closingDay, card.closingRule),
+                calendar.dueDate(
+                    month,
+                    card.dueDay,
+                    card.dueRule,
+                    calendar.closingDate(month, card.closingDay, card.closingRule),
+                ),
             ),
         )
 }

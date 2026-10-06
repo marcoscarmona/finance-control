@@ -2,7 +2,7 @@ spring:
   application:
     name: financial-control-backend
   datasource:
-    url: ${DB_URL:jdbc:postgresql://postgres:5432/financial_control}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/financial_control}
     username: ${DB_USERNAME:financial_user}
     password: ${DB_PASSWORD:financial_password}
     driver-class-name: org.postgresql.Driver

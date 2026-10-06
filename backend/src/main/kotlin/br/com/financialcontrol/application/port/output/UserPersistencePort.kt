@@ -8,5 +8,7 @@ interface UserPersistencePort {
 
     fun findById(id: UUID): User?
 
+    fun findByEmail(email: String): User?
+
     fun existsByEmail(email: String): Boolean
 }

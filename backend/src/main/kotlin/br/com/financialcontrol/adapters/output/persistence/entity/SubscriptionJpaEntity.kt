@@ -7,6 +7,8 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.math.BigDecimal
 import java.util.UUID
 
@@ -21,6 +23,6 @@ class SubscriptionJpaEntity(
     var name: String = "",
     var amount: BigDecimal = BigDecimal.ZERO,
     @Enumerated(EnumType.STRING) var frequency: SubscriptionFrequency = SubscriptionFrequency.MONTHLY,
-    @Column(name = "charge_day") var chargeDay: Int = 1,
+    @JdbcTypeCode(SqlTypes.SMALLINT) @Column(name = "charge_day") var chargeDay: Int = 1,
     var active: Boolean = true,
 )

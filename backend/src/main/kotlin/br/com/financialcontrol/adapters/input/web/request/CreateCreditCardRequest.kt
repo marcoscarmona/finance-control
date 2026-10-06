@@ -1,5 +1,6 @@
 package br.com.financialcontrol.adapters.input.web.request
 
+import br.com.financialcontrol.domain.enum.CardDateRule
 import jakarta.validation.constraints.DecimalMin
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
@@ -15,4 +16,6 @@ data class CreateCreditCardRequest(
     @field:DecimalMin("0.01") val limitAmount: BigDecimal,
     @field:Min(1) @field:Max(31) val closingDay: Int,
     @field:Min(1) @field:Max(31) val dueDay: Int,
+    val closingRule: CardDateRule = CardDateRule.FIXED_DAY,
+    val dueRule: CardDateRule = CardDateRule.FIXED_DAY,
 )

@@ -17,6 +17,7 @@ import br.com.financialcontrol.application.usecase.ExpenseApplicationService
 import br.com.financialcontrol.application.usecase.MonthlyReportApplicationService
 import br.com.financialcontrol.application.usecase.SubscriptionApplicationService
 import br.com.financialcontrol.application.usecase.UserApplicationService
+import br.com.financialcontrol.domain.service.CardCalendar
 import br.com.financialcontrol.domain.service.InstallmentCalculator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -25,6 +26,9 @@ import org.springframework.context.annotation.Configuration
 class ApplicationConfiguration {
     @Bean
     fun installmentCalculator() = InstallmentCalculator()
+
+    @Bean
+    fun cardCalendar() = CardCalendar()
 
     @Bean
     fun userApplicationService(users: UserPersistencePort) = UserApplicationService(users)
@@ -54,7 +58,8 @@ class ApplicationConfiguration {
         invoices: CardInvoicePersistencePort,
         installments: ExpenseInstallmentPersistencePort,
         calculator: InstallmentCalculator,
-    ) = CreditCardApplicationService(banks, cards, invoices, installments, calculator)
+        calendar: CardCalendar,
+    ) = CreditCardApplicationService(banks, cards, invoices, installments, calculator, calendar)
 
     @Bean
     fun subscriptionApplicationService(
@@ -73,7 +78,8 @@ class ApplicationConfiguration {
         installments: ExpenseInstallmentPersistencePort,
         invoices: CardInvoicePersistencePort,
         calculator: InstallmentCalculator,
-    ) = ExpenseApplicationService(categories, accounts, cards, expenses, installments, invoices, calculator)
+        calendar: CardCalendar,
+    ) = ExpenseApplicationService(categories, accounts, cards, expenses, installments, invoices, calculator, calendar)
 
     @Bean
     fun monthlyReportApplicationService(
