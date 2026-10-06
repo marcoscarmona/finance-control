@@ -10,7 +10,7 @@ class WebCorsConfig : WebMvcConfigurer {
         registry
             .addMapping("/api/**")
             .allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*")
-            .allowedMethods("GET", "POST", "OPTIONS")
+            .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             .allowedHeaders("Content-Type")
             .maxAge(3600)
     }
