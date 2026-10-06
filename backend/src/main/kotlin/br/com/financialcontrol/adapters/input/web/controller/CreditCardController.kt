@@ -1,15 +1,19 @@
 package br.com.financialcontrol.adapters.input.web.controller
 
 import br.com.financialcontrol.adapters.input.web.request.CreateCreditCardRequest
+import br.com.financialcontrol.adapters.input.web.request.SetCurrentCardInvoiceTotalRequest
 import br.com.financialcontrol.application.dto.CreateCreditCardCommand
+import br.com.financialcontrol.application.dto.SetCurrentCardInvoiceTotalCommand
 import br.com.financialcontrol.application.port.input.CreateCreditCardUseCase
 import br.com.financialcontrol.application.port.input.GetCardInvoiceUseCase
 import br.com.financialcontrol.application.port.input.ListCreditCardsUseCase
+import br.com.financialcontrol.application.port.input.SetCurrentCardInvoiceTotalUseCase
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -23,6 +27,7 @@ class CreditCardController(
     private val create: CreateCreditCardUseCase,
     private val list: ListCreditCardsUseCase,
     private val invoice: GetCardInvoiceUseCase,
+    private val setCurrentInvoiceTotal: SetCurrentCardInvoiceTotalUseCase,
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -55,4 +60,11 @@ class CreditCardController(
         @PathVariable year: Int,
         @PathVariable month: Int,
     ) = invoice.execute(userId, cardId, YearMonth.of(year, month))
+
+    @PutMapping("/{cardId}/invoices/current-total")
+    fun setCurrentInvoiceTotal(
+        @PathVariable userId: UUID,
+        @PathVariable cardId: UUID,
+        @Valid @RequestBody body: SetCurrentCardInvoiceTotalRequest,
+    ) = setCurrentInvoiceTotal.execute(userId, cardId, SetCurrentCardInvoiceTotalCommand(body.totalAmount))
 }

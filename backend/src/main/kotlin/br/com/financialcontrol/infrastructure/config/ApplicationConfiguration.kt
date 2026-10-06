@@ -2,6 +2,7 @@ package br.com.financialcontrol.infrastructure.config
 
 import br.com.financialcontrol.application.port.output.AccountPersistencePort
 import br.com.financialcontrol.application.port.output.BankPersistencePort
+import br.com.financialcontrol.application.port.output.CardInvoiceManualTotalPersistencePort
 import br.com.financialcontrol.application.port.output.CardInvoicePersistencePort
 import br.com.financialcontrol.application.port.output.CategoryPersistencePort
 import br.com.financialcontrol.application.port.output.CreditCardPersistencePort
@@ -14,6 +15,7 @@ import br.com.financialcontrol.application.usecase.BankApplicationService
 import br.com.financialcontrol.application.usecase.CategoryApplicationService
 import br.com.financialcontrol.application.usecase.CreditCardApplicationService
 import br.com.financialcontrol.application.usecase.ExpenseApplicationService
+import br.com.financialcontrol.application.usecase.ManualCardInvoiceTotalApplicationService
 import br.com.financialcontrol.application.usecase.MonthlyReportApplicationService
 import br.com.financialcontrol.application.usecase.SubscriptionApplicationService
 import br.com.financialcontrol.application.usecase.UserApplicationService
@@ -89,5 +91,12 @@ class ApplicationConfiguration {
         categories: CategoryPersistencePort,
         cards: CreditCardPersistencePort,
         subscriptions: SubscriptionPersistencePort,
-    ) = MonthlyReportApplicationService(users, installments, expenses, categories, cards, subscriptions)
+        manualTotals: CardInvoiceManualTotalPersistencePort,
+    ) = MonthlyReportApplicationService(users, installments, expenses, categories, cards, subscriptions, manualTotals)
+
+    @Bean
+    fun manualCardInvoiceTotalApplicationService(
+        cards: CreditCardPersistencePort,
+        totals: CardInvoiceManualTotalPersistencePort,
+    ) = ManualCardInvoiceTotalApplicationService(cards, totals)
 }

@@ -14,6 +14,9 @@ data class CardTotal(
     val cardId: UUID,
     val cardName: String,
     val total: BigDecimal,
+    val detailedTotal: BigDecimal,
+    val manualTotal: BigDecimal?,
+    val adjustment: BigDecimal,
 )
 
 data class SubscriptionForecast(
