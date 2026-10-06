@@ -12,7 +12,7 @@ class InstallmentCalculator {
         count: Int,
     ): List<BigDecimal> {
         require(count > 0)
-        require(total > BigDecimal.ZERO)
+        require(total.compareTo(BigDecimal.ZERO) != 0)
         val base = total.divide(BigDecimal(count), 2, RoundingMode.DOWN)
         val remainder = total - base * BigDecimal(count)
         return List(count) { if (it == count - 1) base + remainder else base }
